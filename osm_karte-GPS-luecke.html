@@ -1,0 +1,256 @@
+<html>
+<head>
+<style type="text/css">
+.blinking{
+    animation:blinkingText 1.2s infinite;
+}
+@keyframes blinkingText {
+    0% {     color: #000;  }
+    49% {    color: #000; }
+    60% {    color: transparent; }
+    99% {    color:transparent;  }
+    100% {   color: #000;    }
+}
+table {
+
+width:400px;
+
+}
+
+#table1{
+position: absolute;
+left: 900px;
+top:  490px;
+z-index: 5;
+
+}
+
+#table2{
+position: absolute;
+left: 900px;
+top:  645px;
+z-index: 5;
+}
+
+#table3{
+position: absolute;
+left: 900px;
+top:  800px;
+z-index: 5;
+}
+
+.table{
+background-color: #991144BF;
+color: white;
+}
+
+h3 {text-align: center;};
+
+
+</style> 
+</head>
+<body >
+  <!-- Karte -->
+
+  
+  <div id="mapdiv" style="position:absolute;top:0px;left:0px;height:100%;width:100%	;z-index: 1"></div>
+  
+  <!-- Position -->
+  <div class="blinking" style="color:red;position: absolute;top: 50%;left: 50%;z-index: 10000">	&#10026;</div>
+  
+  <!-- Aufgabe 3: Wo auf der Karte ist der Stern platziert?? Schau dir die Kartengröße und die Position des Sterns an! -->  
+  
+  
+  <!-- Ausgabe -->
+    <div style="position: absolute;top: 10px;left: 610px; width: 300px; height: 600px;">  
+			<table class="table" id="table1" border="1" width="100">
+						<tr>
+								<td>Position (Breitengrad)</td><td id="gps1"></td>
+						</tr>
+						<tr>
+								<td>Position (Längengrad)</td><td id="gps2"></td>
+						</tr>
+						<tr>
+								<td>Genauigkeit in Meter</td><td id="gps3"></td>
+						</tr>
+						<tr>
+								<td>Höhe über N.N.</td><td id="gps4"></td>
+						</tr>
+						<tr>
+								<td>Zeitstempel</td><td id="gps5"></td>
+						</tr>
+						<tr>
+								<td>Fehlercode</td><td id="fehler"></td>
+						</tr>
+				</table> 
+				
+				<table class="table" id="table2" border="1" width="100">
+						<tr>
+								<td>Ziel</td>
+								<td>Entfernung</td>
+								<td>Richtung</td>
+						</tr>
+						<tr>
+								<td>1</td>
+								<td id="entfernung0"></td>
+								<td id="richtung0"></td>
+						</tr>
+						<tr>
+								<td>2</td>
+								<td id="entfernung1"></td>
+								<td id="richtung1"></td>
+						</tr>						<tr>
+								<td>3</td>
+								<td id="entfernung2"></td>
+								<td id="richtung2"></td>
+						</tr>		<tr>
+								<td>4</td>
+								<td id="entfernung3"></td>
+								<td id="richtung3"></td>
+						</tr>	<tr>
+								<td>5</td>
+								<td id="entfernung4"></td>
+								<td id="richtung4"></td>
+						</tr>															
+				</table>  
+				<table class="table" id="table3" border="0" width="200">
+						<tr>
+								<td id="ausgabe"></td>
+						</tr>				
+				</table>  
+	 </div> 
+	 <!-- Aufgabe 4: Die Tabelle ist optisch nicht gelungen. Mach sie schöner! -->
+	 
+<!-- fertige Skripte -->
+  	 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.11/lib/OpenLayers.js"></script>
+
+
+ <!-- eigene Skripte --> 
+   <script src="entfernung.js">
+
+</script>
+  <script>
+   
+   
+    //erstmal die Karte auf den Bildschirm zaubern
+    map = new OpenLayers.Map("mapdiv");
+    map.addLayer(new OpenLayers.Layer.OSM());
+    
+    epsg4326 =  new OpenLayers.Projection("EPSG:4326"); //WGS 1984 projection    
+    projectTo = map.getProjectionObject(); //The map projection (Spherical Mercator)
+
+    //Startposition der Karte vorgeben, so lange Position noch nicht bestimmt ist    
+    var lonLat = new OpenLayers.LonLat(7.861 ,48.1156 )
+          .transform(
+            new OpenLayers.Projection("EPSG:4326"), // Transformation aus dem Koordinatensystem WGS 1984
+            map.getProjectionObject() // in das Koordinatensystem 'Spherical Mercator Projection'
+          );
+    
+  //Aufgabe 5 (optional): Zoomfaktor in Abhängigkeit zur Position des nächsten Markers    
+    
+    var zoom=17;
+    map.setCenter (lonLat, zoom);
+    
+    
+    // Marker in einem Array anlegen. 
+    // Das würde auch in einem einzigen Array gehen
+    // Hier würde ich der Einfachheit wegen mehrere Arrays nehmen
+    
+    
+    //Aufgabe 1: Hier machen wir 5 Arrays mit den Namen laenge, breite, beschreibung, beschreibung_text und markerbild
+    //Die Bilder für den Marker liegen im Unterverzeichnis img   
+    
+    var laenge=[7.849759,7.847999,7.850033,7.847651,7.849887];
+    var breite=[48.121520,48.121800,48.122319,48.121328,48.120261];
+    var beschreibung=["<h1>Markgrafenschloss (Museum) </h1>","<h1>Emmendinger Tor </h1>","<h1>Kirche Bonifatius </h1>","<h1>Stadtbibliothek </h1>","<h1>Tagebucharchiv </h1>"];
+    var markerbild=["img/marker.png","img/marker.png","img/marker.png","img/marker.png","img/marker.png"];
+    var beschreibung_text=["<h3>Markgrafenschloss</h3>Das Markgrafenschloss in Emmendingen ist ein reizvoller Renaissancebau am Rande der Altstadt von Emmendingen. Heute ist hier die stadtgeschichtliche Sammlung untergebracht. Der Schlosskeller mit Kreuzgewölbe im Erdgeschoss wird als Kleinkunstbühne und Veranstaltungsraum genutzt. " ,"<h3>Das Emmendinger Tor</h3>Emmendinger Tor ist das Wahrzeichen der Stadt. ","<h3>Kirche Bonifatius </h3>Die katholische Kirche St. Bonifatius wurde 1863 erbaut und 1894–1896 sowie 1911–1913 erweitert. Im Innern befindet sich ein gemalter spätgotischer Flügelaltar 1473 von Friedrich Herlin. 1938 erhielt die Kirche eine Orgel von M. Welte & Söhne.","<h3>Die Stadtbibliothek </h3>Die Stadtbibliothek war einst das Schlosserhaus. Indem wohnten Johann Georg Schlosser und Cornelia Schlosser (J.W. Goethes Schwester ), Herzog Karl August von Weimar, Jakob Michael Reinhold Lenz, Johann Georg Jacobi und Johann Caspar Lavater. Heute diehnt das Haus als Stadtbibliothek.","<h3>Das Tagebucharchiv</h3>Das Deutsche Tagebucharchiv e. V. (DTA) in Emmendingen sammelt seit 1998 private Lebenszeugnisse (Tagebücher, Briefwechsel und Lebenserinnerungen) aus der Zeit Ende des 18. Jahrhunderts bis zur Gegenwart. Zurzeit bewahrt das Archiv über 20.000 Zeitzeugnisse von rund 4.000 Autoren (Stand Juni 2018)."];
+    
+    //Jetzt werden die Marker hinzugefügt, wir nehmen die Position, Beschreibung und das Bildchen aus den arrays
+    var vectorLayer = new OpenLayers.Layer.Vector("Overlay");
+    for (i=0;i<breite.length;i++) {
+				  		    var feature = new OpenLayers.Feature.Vector(
+				            new OpenLayers.Geometry.Point( laenge[i], breite[i] ).transform(epsg4326, projectTo),
+				            {description:beschreibung[i]} ,
+				            {externalGraphic:markerbild[i] , graphicHeight: 25, graphicWidth: 21, graphicXOffset:-12, graphicYOffset:-25  }
+				        );    
+				    vectorLayer.addFeatures(feature); //pop-up dem Layer hinzufügen	
+    }
+    map.addLayer(vectorLayer); //auf Karte hinzufügen
+ 
+   //Dann lesen wir die eigene Position aus
+	getLocation();
+	
+	function getLocation() {
+	    if (navigator.geolocation) {
+	   		var options = {enableHighAccuracy: true, frequency: 100,timeout : 30000,maximumAge : 0};
+	         navigator.geolocation.watchPosition(showPosition, showError,options);   
+	        } 
+	        else { 
+	        document.getElementById("fehler").innerHTML = "Geolocation wird von Ihrem Browser nicht unterstützt";
+	       }
+	}
+
+
+
+	function showPosition(position) {
+	    	lat = position.coords.latitude;
+	    	lon = position.coords.longitude;
+			acc = position.coords.accuracy;
+			time = position.timestamp;
+			document.getElementById("gps1").innerHTML=Math.floor(1000000*lat)/1000000;  //Runden auf 6 Nachkommastellen
+			document.getElementById("gps2").innerHTML=Math.floor(1000000*lon)/1000000; //Runden auf 6 Nachkommastellen
+			document.getElementById("gps3").innerHTML=acc;
+			document.getElementById("gps4").innerHTML=position.coords.altitude
+			document.getElementById("gps5").innerHTML=time;
+			
+			//Aktuelle Position bestimmen und Karte zentrieren			
+			if(lat!=0){
+						 lonLat = new OpenLayers.LonLat( lon, lat).transform(
+						            new OpenLayers.Projection("EPSG:4326"), // Transformation aus dem Koordinatensystem WGS 1984
+						            map.getProjectionObject() // in das Koordinatensystem 'Spherical Mercator Projection'
+						          );
+			          map.setCenter (lonLat, zoom);
+						
+						//Für alle Marker die Entfernung und Richtung ausgeben			
+						
+						//Aufgabe 2:
+						//Eine for-Schleife zählt über die Länge der arrays (eines Arrays)
+						//Die Funktion entfernung_und_richtung_ausgeben wird mit der Schleifenvariablen und der aktuelle Position (Längen und Breitengrad) aufgerufen
+						//Wenn die entfernungberechnen zwischen der aktuellen Position und der Position des Arrayeintrags i kleiner als 15 ist, gib im Element "ausgabe" den passenden Text aus beschreibung_text aus.
+																
+						for (i=0;i<breite.length;i++) {
+							entfernung_und_richtung_ausgeben(i,lon,lat);
+							if (entfernungberechnen(lat,lon,breite[i],laenge[i])< 15 ) {
+								document.getElementById("ausgabe").innerHTML=beschreibung_text[i];
+							}
+							
+						}
+				
+			}
+	}
+         
+
+	function showError(error) {
+	    switch(error.code) {
+	        case error.PERMISSION_DENIED:
+	           document.getElementById("fehler").innerHTML = "Zugriff verweigert"
+	            break;
+	        case error.POSITION_UNAVAILABLE:
+	           document.getElementById("fehler").innerHTML = "Position nicht verfügbar"
+	            break;
+	        case error.TIMEOUT:
+	           document.getElementById("fehler").innerHTML = "Timeout der Anfrage"
+	            break;
+	        case error.UNKNOWN_ERROR:
+	            document.getElementById("fehler").innerHTML = "Unbekannter Fehler"
+	            break;
+	    }
+	} 
+  </script>
+  <script src="controls.js"></script>
+
+
+
+</body></html>
